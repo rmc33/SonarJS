@@ -20,11 +20,19 @@
 package org.sonar.javascript.checks;
 
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URL;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 import org.sonar.api.rules.AnnotationRuleParser;
@@ -50,6 +58,39 @@ public class CheckListTest {
       }
     }
     assertThat(CheckList.getAllChecks().size()).isEqualTo(count);
+  }
+
+  @Test
+  public void checksToMigrate() throws Exception {
+    System.out.println(CheckList.getJavaScriptChecks().size());
+    List<Class<? extends JavaScriptCheck>> classes = CheckList.getJavaScriptChecks().stream()
+      .filter(c -> !EslintBasedCheck.class.isAssignableFrom(c))
+      .filter(c -> "deprecated".equals(status(ruleKey(c))))
+      .collect(Collectors.toList());
+    System.out.println(classes.size());
+
+    classes.sort(Comparator.comparing(CheckListTest::ruleKey));
+
+
+    classes.forEach(c -> System.out.println(ruleKey(c) + " " + c.getCanonicalName() + " " + status(ruleKey(c))));
+  }
+
+  private String status(final String ruleKey) {
+    String RESOURCE_PATH = "/org/sonar/l10n/javascript/rules/javascript";
+    Gson gson = new Gson();
+
+    URL resource = getClass().getResource(RESOURCE_PATH + "/" + ruleKey + ".json");
+    try (Reader r = new InputStreamReader(resource.openStream())) {
+      JsonObject json = gson.fromJson(r, JsonObject.class);
+      return json.get("status").getAsString();
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  static String ruleKey(Class<? extends JavaScriptCheck> clazz) {
+    org.sonar.check.Rule rule = clazz.getAnnotation(org.sonar.check.Rule.class);
+    return rule.key();
   }
 
   /**
