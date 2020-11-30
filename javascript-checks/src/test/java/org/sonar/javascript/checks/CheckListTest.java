@@ -65,7 +65,7 @@ public class CheckListTest {
     System.out.println(CheckList.getJavaScriptChecks().size());
     List<Class<? extends JavaScriptCheck>> classes = CheckList.getJavaScriptChecks().stream()
       .filter(c -> !EslintBasedCheck.class.isAssignableFrom(c))
-      .filter(c -> "deprecated".equals(status(ruleKey(c))))
+//      .filter(c -> "deprecated".equals(status(ruleKey(c))))
       .collect(Collectors.toList());
     System.out.println(classes.size());
 
