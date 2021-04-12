@@ -193,8 +193,8 @@ public class CoverageTest {
       .contains("DEBUG: Problem during processing LCOV report: can't save DA data for line 12 of coverage report file")
       .contains("DEBUG: Problem during processing LCOV report: can't save BRDA data for line 18 of coverage report file");
 
-    assertThat(getMeasureAsInt(projectKey, "lines_to_cover")).isEqualTo(6);
-    assertThat(getMeasureAsInt(projectKey, "uncovered_lines")).isEqualTo(1);
+    assertThat(getMeasureAsInt(projectKey, "lines_to_cover")).isEqualTo(7);
+    assertThat(getMeasureAsInt(projectKey, "uncovered_lines")).isEqualTo(2);
     assertThat(getMeasureAsInt(projectKey, "conditions_to_cover")).isEqualTo(3);
     assertThat(getMeasureAsInt(projectKey, "uncovered_conditions")).isEqualTo(0);
   }
